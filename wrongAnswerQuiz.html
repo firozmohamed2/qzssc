@@ -101,36 +101,54 @@ const firebaseConfig = {
 
 
     const id = localStorage.getItem('id');
+    console.log(id);
+
+
+
+    fetchQuizDataAndCreateQuiz();
 
 
 
 
 
-    firestore.collection('ssc').doc("questions").collection("wrong_answers").where("topic", "==", id)
-    .get()
-    .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            let currentQuestion = {};
-            var data = doc.data();
-            // doc.data() is never undefined for query doc snapshots
-           // console.log(doc.id, " => ", doc.data().options[0]);
-            currentQuestion.question = data.question.trim();
-            currentQuestion.options = [];
-            for(var i=0;i<4;i++){
-                currentQuestion.options.push(data.options[i]);
-            }
-            currentQuestion.answer = data.answer.trim();
-            currentQuestion.docId = data.docId;
-            currentQuestion.topic = data.topic;
-            questions.push(currentQuestion);
+    async function fetchQuizDataAndCreateQuiz() {
+        const querySnapshot = await firestore
+          .collection('ssc')
+          .doc('questions')
+          .collection('wrong_answers')
+          .where('topic', '==', id)
+          .get();
+
+        const questionPromises = querySnapshot.docs.map(async (doc) => {
+          const currentQuestion = {};
+          const data = doc.data();
+          currentQuestion.docId = data.docId;
+
+          const docRef = firestore
+            .collection('ssc')
+            .doc('questions')
+            .collection('all_questions')
+            .doc(currentQuestion.docId);
+
+          const docSnapshot = await docRef.get();
+          if (docSnapshot.exists) {
+            const documentData = docSnapshot.data();
+
+            currentQuestion.question = documentData.question.trim();
+            currentQuestion.options = documentData.options.slice(0, 4);
+            currentQuestion.answer = documentData.answer.trim();
+            currentQuestion.topic = documentData.topic;
+          } else {
+            console.log('Document does not exist.');
+          }
+
+          return currentQuestion;
         });
 
+        questions = await Promise.all(questionPromises);
         console.log(questions);
         createQuiz(questions);
-    })
-    .catch((error) => {
-        console.log("Error getting documents: ", error);
-    });
+  }
 
 
    
@@ -232,6 +250,8 @@ const firebaseConfig = {
 
     // Create the quiz
     function createQuiz(questions) {
+
+      console.log(questions);
 
       shuffleArray(questions);
 
