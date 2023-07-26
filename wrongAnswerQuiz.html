@@ -1,0 +1,494 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz Program</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-auth.js"></script>
+  <style>
+    
+    #quiz{
+      margin-bottom: 60px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quiz Program</h1>
+  <div id="quiz"></div>
+ 
+  
+
+
+
+
+
+  <script>
+
+
+const firebaseConfig = {
+    apiKey: "AIzaSyA88fPkOvcI4QA9qD3ROpk-ay-V6ibQQlc",
+    authDomain: "my-application-7fd40.firebaseapp.com",
+    projectId: "my-application-7fd40",
+    storageBucket: "my-application-7fd40.appspot.com",
+    messagingSenderId: "269589994279",
+    appId: "1:269589994279:web:4c617a622c328a1224e702",
+    measurementId: "G-D8MD1J28GR"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  
+  
+  
+  
+  //auth state check - login or not 
+  
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+  
+      var uid = user.uid;
+  
+  
+      if (user.isAnonymous) {
+        signinState = 0;
+      } else {
+        email = user.email;
+      }
+  
+  
+  
+      // ...
+    } else {
+      // User is signed out
+      // ...
+      signinState = 0;
+      //anonymous signin
+  
+  
+  
+  
+  
+      firebase.auth().signInAnonymously()
+        .then(function() {
+  
+  
+        }).catch(function(error) {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          console.log(errorCode);
+          console.log(errorMessage);
+        });
+    }
+  });
+  
+  //auth check completed
+  
+  
+  
+  //firebase components
+  const firestore = firebase.firestore();
+
+
+
+
+
+    let questionsData; // Global variable to store quiz data
+    const quizContainer = document.getElementById('quiz');
+    var lastAddedWrongIndex=-1;
+    let questions = [];
+    let wrongQuestionsArray = [];
+
+
+    const id = localStorage.getItem('id');
+
+
+
+
+
+    firestore.collection('ssc').doc("questions").collection("wrong_answers").where("topic", "==", id)
+    .get()
+    .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            let currentQuestion = {};
+            var data = doc.data();
+            // doc.data() is never undefined for query doc snapshots
+           // console.log(doc.id, " => ", doc.data().options[0]);
+            currentQuestion.question = data.question.trim();
+            currentQuestion.options = [];
+            for(var i=0;i<4;i++){
+                currentQuestion.options.push(data.options[i]);
+            }
+            currentQuestion.answer = data.answer.trim();
+            currentQuestion.docId = data.docId;
+            currentQuestion.topic = data.topic;
+            questions.push(currentQuestion);
+        });
+
+        console.log(questions);
+        createQuiz(questions);
+    })
+    .catch((error) => {
+        console.log("Error getting documents: ", error);
+    });
+
+
+   
+
+
+    // Fetch the text file
+    
+
+    // Parse the quiz data from text file
+    function parseQuizData(data) {
+      const lines = data.split('\n');
+      let currentQuestion = {};
+
+      lines.forEach(line => {
+        const trimmedLine = line.trim();
+        if (trimmedLine !== '') {
+          if (trimmedLine.startsWith('Q')) {
+            currentQuestion.question = trimmedLine.substring(2);
+          } else if (trimmedLine.startsWith('A')) {
+            if (!currentQuestion.options) {
+              currentQuestion.options = [];
+            }
+            currentQuestion.options.push(trimmedLine.substring(3));
+          }
+          else if (trimmedLine.startsWith('a')) {
+            if (!currentQuestion.options) {
+              currentQuestion.options = [];
+            }
+            currentQuestion.options.push(trimmedLine.substring(3));
+          }
+
+          else if (trimmedLine.startsWith('B')) {
+            if (!currentQuestion.options) {
+              currentQuestion.options = [];
+            }
+            currentQuestion.options.push(trimmedLine.substring(3));
+          }
+          else if (trimmedLine.startsWith('b')) {
+            if (!currentQuestion.options) {
+              currentQuestion.options = [];
+            }
+            currentQuestion.options.push(trimmedLine.substring(3));
+          }
+          else if (trimmedLine.startsWith('C')) {
+            if (!currentQuestion.options) {
+              currentQuestion.options = [];
+            }
+            currentQuestion.options.push(trimmedLine.substring(3));
+          }
+          else if (trimmedLine.startsWith('c')) {
+            if (!currentQuestion.options) {
+              currentQuestion.options = [];
+            }
+            currentQuestion.options.push(trimmedLine.substring(3));
+          }
+
+          else if (trimmedLine.startsWith('D')) {
+            if (!currentQuestion.options) {
+              currentQuestion.options = [];
+            }
+            currentQuestion.options.push(trimmedLine.substring(3));
+          }
+          else if (trimmedLine.startsWith('d')) {
+            if (!currentQuestion.options) {
+              currentQuestion.options = [];
+            }
+            currentQuestion.options.push(trimmedLine.substring(3));
+          }
+
+
+          
+
+
+          
+          else if (trimmedLine.startsWith('Z')) {
+            var correctOption = trimmedLine.substring(2);
+
+            switch (correctOption) {
+                case 'a' : currentQuestion.answer = currentQuestion.options[0]; break;
+                case 'b' : currentQuestion.answer = currentQuestion.options[1]; break;
+                case 'c' : currentQuestion.answer = currentQuestion.options[2]; break;
+                default : currentQuestion.answer = currentQuestion.options[3]; break;
+
+            }
+            // currentQuestion.answer = trimmedLine.substring(15);
+            shuffleArray(currentQuestion.options);
+
+            questions.push(currentQuestion);
+            currentQuestion = {};
+          }
+          else {
+            
+          }
+        }
+      });
+
+      return questions;
+    }
+
+    // Create the quiz
+    function createQuiz(questions) {
+
+      shuffleArray(questions);
+
+
+      
+      let quizHTML = '';
+
+      questions.forEach((question, index) => {
+        const optionsHTML = question.options.map((option, optionIndex) => `
+          <label>
+            <input type="radio" class="" name="question${index}" value="${option}" onclick="checkAnswer(${index}, '${option}')">
+            ${option}
+          </label>
+        `).join('');
+
+        
+
+        const questionHTML = `
+          <div>
+            <h2>Question ${index + 1}</h2>
+            <p>${question.question}</p>
+            <div>
+              ${optionsHTML}
+            </div>
+            <p id="feedback${index}"></p>
+          </div>
+        `;
+
+        quizHTML += questionHTML;
+      });
+
+      quizContainer.innerHTML = quizHTML;
+    }
+
+    // Check the answer
+    function checkAnswer(questionIndex, selectedOption) {
+      const question = questions[questionIndex];
+     
+      const feedbackElement = document.getElementById(`feedback${questionIndex}`);
+
+      console.log(question.answer + " " + selectedOption);
+
+      if (selectedOption === question.answer) {
+        feedbackElement.textContent = 'Correct!';
+        feedbackElement.style.color = 'green';
+
+
+
+
+        const query = firestore.collection('ssc').doc("questions").collection("wrong_answers").where('docId', '==', question.docId);
+
+// Execute the query
+query.get()
+  .then((querySnapshot) => {
+    if (!querySnapshot.empty) {
+      // Document with the given attribute exists
+
+      
+
+
+
+
+const updatePromises = [];
+
+// Collect all update promises
+querySnapshot.forEach((doc) => {
+  const docRef = doc.ref;
+  var attemptCount= doc.data().numberofAttempts;
+  attemptCount++;
+  var negativeScore= doc.data().ngativeScore;
+  negativeScore-=3;
+  const updateData = {
+        "numberofAttempts": attemptCount,
+        "ngativeScore": negativeScore
+      };
+
+  const updatePromise = docRef.update(updateData);
+  updatePromises.push(updatePromise);
+});
+
+// Wait for all updates to complete
+return Promise.all(updatePromises);
+
+
+
+
+
+
+
+
+      querySnapshot.forEach((doc) => {
+        console.log('Found document:', doc.id, doc.data());
+        doc.update(updateData)
+  .then(() => {
+    console.log('Document successfully updated.');
+  })
+  .catch((error) => {
+    console.error('Error updating document:', error);
+  });
+        
+
+      });
+} else {
+
+
+
+
+
+}
+})
+.catch((error) => {
+console.error('Error getting documents:', error);
+});
+
+
+
+
+
+        
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      } else {
+        feedbackElement.textContent = 'Wrong! Correct answer is ' + question.answer ;
+        feedbackElement.style.color = 'red';
+        console.log(question);
+
+
+
+
+         
+        const query = firestore.collection('ssc').doc("questions").collection("wrong_answers").where('docId', '==', question.docId);
+
+            // Execute the query
+            query.get()
+              .then((querySnapshot) => {
+                if (!querySnapshot.empty) {
+                  // Document with the given attribute exists
+
+                  
+
+
+
+
+            const updatePromises = [];
+
+            // Collect all update promises
+            querySnapshot.forEach((doc) => {
+              const docRef = doc.ref;
+              var attemptCount= doc.data().numberofAttempts;
+              attemptCount++;
+              var negativeScore= doc.data().ngativeScore;
+              negativeScore+=3;
+              const updateData = {
+                    "numberofAttempts": attemptCount,
+                    "ngativeScore": negativeScore
+                  };
+
+              const updatePromise = docRef.update(updateData);
+              updatePromises.push(updatePromise);
+            });
+
+            // Wait for all updates to complete
+            return Promise.all(updatePromises);
+            
+
+
+
+
+
+
+
+                  querySnapshot.forEach((doc) => {
+                    console.log('Found document:', doc.id, doc.data());
+                    doc.update(updateData)
+              .then(() => {
+                console.log('Document successfully updated.');
+              })
+              .catch((error) => {
+                console.error('Error updating document:', error);
+              });
+                    
+
+                  });
+    } else {
+     
+
+
+
+
+    }
+  })
+  .catch((error) => {
+    console.error('Error getting documents:', error);
+  });
+
+
+       
+
+
+      
+
+      }
+    }
+
+
+
+
+   
+
+   
+
+
+
+
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+
+
+   
+
+
+  
+
+
+
+    
+    
+
+
+
+
+
+  </script>
+</body>
+</html>
