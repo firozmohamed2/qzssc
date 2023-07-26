@@ -375,9 +375,16 @@ return Promise.all(updatePromises);
 
     // Generate a reference for the new document without actually adding it to Firestore yet
     const newDocRef = firestore.collection('ssc').doc("questions").collection("wrong_answers").doc();
+
+
+    let currentQuestion = {};
+    currentQuestion.docId = questionData.docId;
+    currentQuestion.topic = questionData.topic;
+    currentQuestion.numberofAttempts = questionData.numberofAttempts;
+    currentQuestion.ngativeScore = questionData.ngativeScore;
     
     
-    await newDocRef.set(questionData);
+    await newDocRef.set(currentQuestion);
     // const docRef = await firestore.collection('ssc').doc("questions").collection("all_questions").add(questionData);
     console.log(`Added wrong question`);
   } catch (error) {
