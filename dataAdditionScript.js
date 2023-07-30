@@ -177,42 +177,52 @@ function parseQuizData(data) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
-        currentQuestion.options.push(trimmedLine.substring(3));
+        var t= trimmedLine.substring(3);
+        var c = t.trim();
+
+        currentQuestion.options.push(c);
       } else if (trimmedLine.startsWith('a')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
-        currentQuestion.options.push(trimmedLine.substring(3));
+        var t= trimmedLine.substring(3);
+        var c = t.trim();
       } else if (trimmedLine.startsWith('B')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
-        currentQuestion.options.push(trimmedLine.substring(3));
+        var t= trimmedLine.substring(3);
+        var c = t.trim();
       } else if (trimmedLine.startsWith('b')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
-        currentQuestion.options.push(trimmedLine.substring(3));
+        var t= trimmedLine.substring(3);
+        var c = t.trim();
       } else if (trimmedLine.startsWith('C')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
-        currentQuestion.options.push(trimmedLine.substring(3));
+        var t= trimmedLine.substring(3);
+        var c = t.trim();
       } else if (trimmedLine.startsWith('c')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
-        currentQuestion.options.push(trimmedLine.substring(3));
+        var t= trimmedLine.substring(3);
+        var c = t.trim();
       } else if (trimmedLine.startsWith('D')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
-        currentQuestion.options.push(trimmedLine.substring(3));
+        var t= trimmedLine.substring(3);
+        var c = t.trim();
       } else if (trimmedLine.startsWith('d')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
-        currentQuestion.options.push(trimmedLine.substring(3));
+        var t= trimmedLine.substring(3);
+        var c = t.trim();
       } else if (trimmedLine.startsWith('Z')) {
         var correctOption = trimmedLine.substring(2);
 
