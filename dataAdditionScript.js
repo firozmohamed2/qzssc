@@ -95,26 +95,7 @@ async function saveQuestions() {
   
 
   
-    // try {
-    //   // Generate a reference for the new document without actually adding it to Firestore yet
-    //   const newDocRef = firestore.collection('ssc').doc("topics").collection("topicnames").doc();
     
-    //   // Get the generated document ID
-    //   const docId = newDocRef.id;
-    
-    //   // Set the document ID as the value of the "docId" property in the documentData object
-    //   const documentData = {
-    //     topicName: id,
-    //     docId: docId
-    //   };
-    
-    //   // Add the document to Firestore using the reference with the generated ID
-    //   await newDocRef.set(documentData);
-    
-    //   console.log(`Added question with ID: ${docId}`);
-    // } catch (error) {
-    //   console.error('Error adding document: ', error);
-    // }
     
     
 
@@ -178,51 +159,56 @@ function parseQuizData(data) {
           currentQuestion.options = [];
         }
         var t= trimmedLine.substring(3);
-        var c = t.trim();
-
-        currentQuestion.options.push(c);
+        var c = t.trim();     currentQuestion.options.push(c);
       } else if (trimmedLine.startsWith('a')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
         var t= trimmedLine.substring(3);
-        var c = t.trim();
+        var c = t.trim();     currentQuestion.options.push(c);
+
       } else if (trimmedLine.startsWith('B')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
         var t= trimmedLine.substring(3);
-        var c = t.trim();
+        var c = t.trim();        currentQuestion.options.push(c);
+
       } else if (trimmedLine.startsWith('b')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
         var t= trimmedLine.substring(3);
-        var c = t.trim();
+        var c = t.trim();        currentQuestion.options.push(c);
+
       } else if (trimmedLine.startsWith('C')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
         var t= trimmedLine.substring(3);
-        var c = t.trim();
+        var c = t.trim();        currentQuestion.options.push(c);
+
       } else if (trimmedLine.startsWith('c')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
         var t= trimmedLine.substring(3);
-        var c = t.trim();
+        var c = t.trim();        currentQuestion.options.push(c);
+
       } else if (trimmedLine.startsWith('D')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
         var t= trimmedLine.substring(3);
-        var c = t.trim();
+        var c = t.trim();        currentQuestion.options.push(c);
+
       } else if (trimmedLine.startsWith('d')) {
         if (!currentQuestion.options) {
           currentQuestion.options = [];
         }
         var t= trimmedLine.substring(3);
-        var c = t.trim();
+        var c = t.trim();        currentQuestion.options.push(c);
+
       } else if (trimmedLine.startsWith('Z')) {
         var correctOption = trimmedLine.substring(2);
 
