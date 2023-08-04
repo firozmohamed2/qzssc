@@ -12,13 +12,76 @@
     #quiz{
       margin-bottom: 60px;
     }
+
+
+    /* ... your existing CSS styles ... */
+
+/* Edit popup styles */
+.popup {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  width: 550px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+
+
+
+/* ... your existing CSS styles ... */
+
+
+
+
+
+    
   </style>
 </head>
 <body>
   <h1>Quiz Program</h1>
   <div id="quiz"></div>
+
+  <div id="editPopup" class="popup" style="display: none;">
+    <!-- Your input fields and buttons for editing here -->
+
+    <p id="editId"></p>
+
+    <label>Question:</label>
+    <input type="text" id="editQuestion">
+    <br />
+    <label>Option A:</label>
+    <input type="text" id="editOptionA">
+    <br />
+    <label>Option B:</label>
+    <input type="text" id="editOptionB">
+    <br />
+    <label>Option C:</label>
+    <input type="text" id="editOptionC">
+    <br />
+    <label>Option D:</label>
+    <input type="text" id="editOptionD">
+    <br />
+    <label>Answer:</label>
+    <input type="text" id="editAnswer">
+    <br />
+  
+    <!-- ... -->
+    <button onclick="updateQuestion()">Update</button>
+    <button onclick="closeEditPopup()">Hide</button>
+  </div>
+  
+  </div>
+  
  
   
+
+
+
+<!-- ... your existing HTML code ... -->
 
 
 
@@ -232,39 +295,35 @@ const firebaseConfig = {
 
     // Create the quiz
     function createQuiz(questions) {
+  shuffleArray(questions);
 
-      shuffleArray(questions);
+  let quizHTML = '';
 
+  questions.forEach((question, index) => {
+    const optionsHTML = question.options.map((option, optionIndex) => `
+      <label>
+        <input type="radio" class="" name="question${index}" value="${option}" onclick="checkAnswer(${index}, '${option}')">
+        ${option}
+      </label>
+    `).join('');
 
-      
-      let quizHTML = '';
+    const questionHTML = `
+      <div>
+        <h2>Question ${index + 1}</h2>
+        <p>${question.question}</p>
+        <div>
+          ${optionsHTML}
+        </div>
+        <p id="feedback${index}"></p>
+        <button onclick="openEditPopup(${index})">Edit</button>
+      </div>
+    `;
 
-      questions.forEach((question, index) => {
-        const optionsHTML = question.options.map((option, optionIndex) => `
-          <label>
-            <input type="radio" class="" name="question${index}" value="${option}" onclick="checkAnswer(${index}, '${option}')">
-            ${option}
-          </label>
-        `).join('');
+    quizHTML += questionHTML;
+  });
 
-        
-
-        const questionHTML = `
-          <div>
-            <h2>Question ${index + 1}</h2>
-            <p>${question.question}</p>
-            <div>
-              ${optionsHTML}
-            </div>
-            <p id="feedback${index}"></p>
-          </div>
-        `;
-
-        quizHTML += questionHTML;
-      });
-
-      quizContainer.innerHTML = quizHTML;
-    }
+  quizContainer.innerHTML = quizHTML;
+}
 
     // Check the answer
     function checkAnswer(questionIndex, selectedOption) {
@@ -405,6 +464,111 @@ return Promise.all(updatePromises);
         [array[i], array[j]] = [array[j], array[i]];
       }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+   // ... your existing JavaScript code ...
+
+
+function openEditPopup(questionIndex) {
+  const question = questions[questionIndex];
+
+  // Fill the input fields with question data
+  document.getElementById('editQuestion').value = question.question;
+  document.getElementById('editOptionA').value = question.options[0];
+  document.getElementById('editOptionB').value = question.options[1];
+  document.getElementById('editOptionC').value = question.options[2];
+  document.getElementById('editOptionD').value = question.options[3];
+  document.getElementById('editAnswer').value = question.answer;
+  document.getElementById('editId').innerHTML = question.docId;
+
+  // Show the edit popup
+  const editPopup = document.getElementById('editPopup');
+  editPopup.style.display = 'block';
+
+  console.log("opened");
+}
+
+function closeEditPopup() {
+  // Hide the edit popup
+  const editPopup = document.getElementById('editPopup');
+  editPopup.style.display = 'none';
+}
+
+// ... your existing JavaScript code ...
+
+function updateQuestion() {
+  // Get the updated values from the input fields
+  const editedQuestion = document.getElementById('editQuestion').value.trim();
+  const editedOptionA = document.getElementById('editOptionA').value.trim();
+  const editedOptionB = document.getElementById('editOptionB').value.trim();
+  const editedOptionC = document.getElementById('editOptionC').value.trim();
+  const editedOptionD = document.getElementById('editOptionD').value.trim();
+  const editedAnswer = document.getElementById('editAnswer').value.trim();
+  const docID = document.getElementById('editId').innerHTML;
+
+  // Update the question in the questions array
+  // questions[questionIndex].question = editedQuestion;
+  // questions[questionIndex].options = [editedOptionA, editedOptionB, editedOptionC, editedOptionD];
+  // questions[questionIndex].answer = editedAnswer;
+
+
+
+
+
+ const docRef= firestore.collection('ssc').doc("questions").collection("all_questions").doc(docID);
+
+// Define the updated data as an object
+const updatedData = {
+  question: editedQuestion,
+  options: [editedOptionA,editedOptionB, editedOptionC,editedOptionD],
+   answer: editedAnswer
+  // Add other fields you want to update here
+};
+
+// Call the update method on the document reference
+docRef.update(updatedData)
+  .then(() => {
+    console.log("Document successfully updated!");
+  })
+  .catch((error) => {
+    console.error("Error updating document: ", error);
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Close the popup
+  closeEditPopup();
+
+  
+}
+
 
 
 
